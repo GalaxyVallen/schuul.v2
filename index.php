@@ -1,75 +1,138 @@
-<!doctype html>
+<?php
+
+require 'config/connect.php';
+
+$query = 'select * from nilai';
+
+$datas = $connect->query($query) or die($connect);
+
+if (mysqli_num_rows($datas) > 0) {
+    $rows = [];
+    while ($row = $datas->fetch_assoc()) {
+        $rows[] = $row;
+    }
+
+    // $rows = $datas->fetch_assoc();
+    // var_dump($rows);
+}
+
+?>
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- <link rel="stylesheet" href="css/bootstrap.min.css">
-    <script src="js/bootstrap.min.js"></script> -->
-    <title>Data siswa</title>
+    <title>Data Nilai</title>
 </head>
-<!-- //masukin data siswa -->
 
-<body class="antialiased">
-    <div class="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
-        <div class="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]" aria-hidden="true">
-            <div class="relative left-1/2 -z-10 aspect-[1155/678] w-[340.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#00CC99] to-[#6600FF] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem]" style="clip-path: polygon(76% 16%, 47% 9%, 38% 28%, 0% 0%, 0% 25%, 11% 50%, 5% 100%, 25% 90%, 43% 79%, 42% 97%, 75% 91%, 69% 73%, 57% 43%, 96% 33%);"></div>
-        </div>
-        <div class="mx-auto max-w-2xl text-center">
-            <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Cari Siswa</h2>
-            <p class="mt-2 text-lg leading-8 text-gray-600">
-                Why do you want to know their <span class="font-bold">secret</span>? </p>
-        </div>
+<body>
 
-        <form action="nilai.php" method="get" class="mx-auto mt-16 max-w-xl sm:mt-20">
-            <div class="grid grid-cols-1 gap-x-8 gap-y-6">
-                <div>
-                    <div class="flex mb-3 justify-between items-center">
-                        <label for="first-name" class="block text-base font-semibold leading-6 text-gray-900">Nis</label>
-                        <span class="inline-block text-sm text-gray-500">Wajib</span>
-                    </div>
-                    <div class="mt-2.5">
-                        <input type="text" name="nis" id="first-name" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                    </div>
-                </div>
-                <div>
-                    <div class="flex mb-3 justify-between items-center">
-                        <label for="email" class="block text-base font-semibold leading-6 text-gray-900">Nama siswa</label>
-                        <span class="inline-block text-sm text-gray-500">Wajib</span>
-                    </div>
-                    <div class="mt-2.5">
-                        <input type="text" name="nama" id="email" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                    </div>
-                </div>
-                <div>
-                    <div class="flex mb-3 justify-between items-center">
-                        <label for="hs-select-label" class="block text-base font-semibold dark:text-white">Kelas</label>
-                        <span class="inline-block text-sm text-gray-500">Wajib</span>
-                    </div>
-                    <select id="hs-select-label" name="kelas" class="py-3 ring-1 ring-inset ring-gray-300 px-2 pr-9 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
-                        <option>Pilih kelas</option>
-                        <option value="XII Rpl-1">XII Rpl-1</option>
-                        <option value="XII Rpl-2">XII Rpl-2</option>
-                        <option value="XII Rpl-3">XII Rpl-3</option>
-                    </select>
-                </div>
-            </div>
-            <div class="mt-10">
-                <input type="submit" value="Cari" class="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-            </div>
-        </form>
+    <?php include 'component/nav.php' ?>
+
+    <div class="bg-white px-6 py-24 sm:py-32 lg:px-8">
+        <div class="relative overflow-x-auto shadow-lg sm:rounded-lg max-w-7xl mx-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <caption class="p-5 text-2xl relative font-semibold isolate text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                    Semua siswa yg terdaftar
+                    <p class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">Sekitar <?= count($rows); ?> orang </p>
+                    <div class="bg-gradient-to-br from-sky-50 to-transparent dark:from-blue-900 w-full h-full absolute top-0 left-0 -z-10"></div>
+                    <a href="views/add.php" class="text-gray-100 inline-block mt-3 bg-blue-600 hover:bg-primary-800 focus:ring-4 hover:bg-blue-700 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                        Tambah siswa
+                    </a>
+                </caption>
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">
+                            No
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Nis
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Nama </th>
+                        <th scope="col" class="px-6 py-3">
+                            Kelas
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Nilai hadir
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Nilai tugas
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Nilai formatif
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Nilai uts
+                        </th>
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Nilai uas
+                        </th>
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Nilai akhir
+                        </th>
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Grade
+                        </th>
+                        <!-- <th scope="col" class="px-6 py-3">
+                            <span class="sr-only">Edit</span>
+                        </th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $i = 1; ?>
+                    <?php foreach ($rows as $data) : ?>
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <?= $i ?>
+                            </th>
+                            <td class="px-6 py-4">
+                                <?= $data['nis']; ?>
+                            </td>
+                            </th>
+                            <td class="px-6 py-4">
+                                <a href="views/detail.php?siswa=<?= $data['id']; ?>" class="underline-none text-blue-600 hover:underline"><?= $data['nama']; ?></a>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?= $data['kelas']; ?>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?= $data['nilaiKehadiran']; ?>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?= $data['nilaiTugas']; ?>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?= $data['nilaiFormatif']; ?>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?= $data['nilaiUTS']; ?>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?= $data['nilaiUAS']; ?>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?= $data['nilaiAkhir']; ?>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?= $data['grade']; ?>
+                            </td>
+                            <!-- <td class="px-6 py-4 text-right">
+                            <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                        </td> -->
+                        </tr>
+                        <?php $i++ ?>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+        </div>
     </div>
-
-
-    <!-- <form action="" method="get">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-square" viewBox="0 0 16 16">
-            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1v-1c0-1-1-4-6-4s-6 3-6 4v1a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12z" />
-        </svg>
-        <input type="text" name="nis">
-    </form> -->
-
 </body>
 
 </html>
