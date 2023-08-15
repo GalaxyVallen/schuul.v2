@@ -18,7 +18,17 @@
 $DB_HOST = 'localhost';
 $DB_USER = 'root';
 $DB_PASSWORD = '';
-$DB_NAME = 'academic';
+$DB_NAME = 'datasiswa';
 
-$connect = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME);
+// $connect = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME);
+// $connect ?: 'Error to connect';exit; 
+
+$connect = new mysqli($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME);
+if ($connect->connect_errno) {
+    // throw new RuntimeException('connection error: ', $connect->connect_error);
+    
+    echo 'connection error: ' . $connect->connect_error;
+    die;
+}
+
 mysqli_select_db($connect, $DB_NAME);
