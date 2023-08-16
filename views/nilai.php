@@ -1,9 +1,29 @@
 <?php
-$nis = $_GET['nis'];
-$nama = $_GET['nama'];
-$kelas = $_GET['kelas'];
+session_start();
 
-// var_dump($kelas);
+require_once '../config/Session.php';
+$newSession = Session::validateSession();
+
+$nis = $newSession['nis'];
+$nama = $newSession['nama'];
+$kelas = $newSession['kelas'];
+
+// try {
+//     if (!isset($_SESSION['nis']) && !isset($_SESSION['nama']) && !isset($_SESSION['kelas'])) {
+//         throw new Exception("Maaf, Data tidak lengkap");
+//     }
+
+//     $nis = $_SESSION['nis'];
+//     $nama = $_SESSION['nama'];
+//     $kelas = $_SESSION['kelas'];
+// } catch (Exception $e) {
+//     $error = $e->getMessage();
+//     $_SESSION['error'] = $error;
+//     header('Location: ../');
+//     exit();
+// }
+
+// var_dump($_SESSION);
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +32,7 @@ $kelas = $_GET['kelas'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../dist/output.css" rel="stylesheet">
     <title>Nilai <?= $nama ?></title>
 </head>
 
@@ -28,7 +48,7 @@ $kelas = $_GET['kelas'];
                 <span class="font-semibold"><?= $nama ?: 'Asuka' ?></span> grades
             </p>
         </div>
-        <form class="mx-auto mt-16 max-w-xl sm:mt-20" action="../result.php" method="post">
+        <form class="mx-auto mt-16 max-w-xl sm:mt-20" action="result.php" method="post">
             <div class=" mx-auto w-96">
                 <div class="mt-2 w-full">
                     <div class="mb-3">
@@ -71,6 +91,8 @@ $kelas = $_GET['kelas'];
             </div>
         </form>
     </div>
+
+    <script src="../dist/flowbite.min.js"></script>
 
 </body>
 

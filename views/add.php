@@ -1,10 +1,25 @@
+<?php
+session_start();
+
+// kalau methodnya posts
+if (isset($_POST['go'])) {
+    $_SESSION['nama'] = $_POST['nama'];
+    $_SESSION['kelas'] = $_POST['kelas'];
+    $_SESSION['nis'] = $_POST['nis'];
+    header('Location: nilai.php');
+    exit;
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <link href="../dist/output.css" rel="stylesheet">
     <!-- <link rel="stylesheet" href="css/bootstrap.min.css">
     <script src="js/bootstrap.min.js"></script> -->
     <title>Data siswa</title>
@@ -22,7 +37,7 @@
                 Why do you want to know their <span class="font-bold">secret</span>? </p>
         </div>
 
-        <form action="nilai.php" method="get" class="mx-auto mt-16 max-w-xl sm:mt-20">
+        <form action="" method="post" class="mx-auto mt-16 max-w-xl sm:mt-20">
             <div class="grid grid-cols-1 gap-x-8 gap-y-6">
                 <div>
                     <div class="relative z-0 w-full mb-6 group">
@@ -31,7 +46,7 @@
                     </div>
                 </div>
                 <div>
-                    <div class="relative z-0 w-full mb-6 group">
+                    <div class="relative z-0 w-full mb-4 group">
                         <input type="text" name="nama" id="floating_name" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
                         <label for="floating_name" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nama siswa</label>
                     </div>
@@ -48,7 +63,7 @@
                 </div>
             </div>
             <div class="mt-10">
-                <input type="submit" value="Cari" class="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                <input type="submit" name="go" value="Cari" class="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             </div>
         </form>
     </div>
@@ -61,6 +76,8 @@
         </svg>
         <input type="text" name="nis">
     </form> -->
+
+    <script src="../dist/flowbite.min.js"></script>
 
 </body>
 

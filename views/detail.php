@@ -1,13 +1,36 @@
 <?php
-require '../config/connect.php';
+session_start();
 
-(isset($_GET['siswa']) && !empty($_GET['siswa'])) ? $id = $_GET['siswa'] : exit;
+require_once '../config/Database.php';
 
-$query = "select * from nilai where nilai.id = {$id}";
+(isset($_GET['siswa']) && !empty($_GET['siswa'])) ? $id = $_GET['siswa'] : die;
 
-$result = $connect->query($query) ?? exit('Siswa ga ada');
+$db =  new Database();
+
+$query = "select * from nilai_siswa where nilai_siswa.id = {$id}";
+
+try {
+    $result = $db->getConnection()->query($query);
+
+    if (!$result) {
+        throw new Exception("Query error: " . $db->getConnection()->error);
+    }
+
+    if (mysqli_num_rows($result) == 0) {
+        throw new Exception("No data found for id " . $_GET['siswa']);
+    }
+} catch (\Throwable $e) {
+    $error = $e->getMessage();
+    $_SESSION['error'] = $error;
+    header('Location: ../index.php');
+    exit();
+}
+
 
 $data = $result->fetch_assoc();
+
+$db->closeConnection();
+
 ?>
 
 
@@ -17,11 +40,11 @@ $data = $result->fetch_assoc();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../dist/output.css" rel="stylesheet">
     <title>Detail</title>
 </head>
 
-<body class="antialised min-">
+<body class="antialised min-h-screen">
     <section class="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
         <div class="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]" aria-hidden="true">
             <div class="relative left-1/2 -z-10 aspect-[1155/678] w-[340.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#00CC99] to-[#6600FF] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem]" style="clip-path: polygon(76% 16%, 47% 9%, 38% 28%, 0% 0%, 0% 25%, 11% 50%, 5% 100%, 25% 90%, 43% 79%, 42% 97%, 75% 91%, 69% 73%, 57% 43%, 96% 33%);"></div>
@@ -32,21 +55,19 @@ $data = $result->fetch_assoc();
                 <p class="font-light text-gray-500 lg:mb-16 sm:text-xl dark:text-gray-400"></p>
             </div>
 
-            <div class="bg-gradient-to-r from-sky-500/20 to-blue-500/20 backdrop-blur-sm w-full max-w-lg py-8 px-6 bg-white mx-auto border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                <div class="flex flex-col items-center pb-5 px-4 pt-4">
-                    <img class="w-24 h-24 mb-3 rounded-full shadow-lg object-cover" src="https://placehold.co/600x400?text=G" alt="Bonnie image" />
-                    <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white"> <?= $data['nama'] ?? 'Rei' ?></h5>
-                    <span class="text-sm text-gray-500 dark:text-gray-400"> <?= $data['kelas'] ?>
-                    </span>
-                    <!-- <div class="flex mt-4 space-x-3 md:mt-6">
-                    <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add friend</a>
-                    <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700">Message</a>
-                </div> -->
+            <div class="overflow-hidden relative max-w-md mx-auto bg-white shadow-lg ring-1 ring-black/5 rounded-xl flex items-center gap-6 dark:bg-slate-800 dark:highlight-white/5">
+                <img class="absolute -left-6 w-28 h-28 rounded-full shadow-lg" src="https://placehold.co/300x300/000000/FFFFFF.webp?text=<?= strtoupper(mb_substr($data['nama'], 0, 1)); ?>">
+                <div class="min-w-0 py-5 pl-28 pr-5">
+                    <div class="text-slate-900 font-semibold text-sm sm:text-lg truncate dark:text-slate-200"><?= $data['nama']; ?></div>
+                    <div class="text-slate-500 font-medium text-sm sm:text-base leading-tight truncate dark:text-slate-400">Kelas: <?= $data['kelas']; ?></div>
                 </div>
             </div>
 
         </div>
     </section>
+
+    <script src="../dist/flowbite.min.js"></script>
+
 </body>
 
 </html>

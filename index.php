@@ -1,20 +1,37 @@
 <?php
+session_start();
 
-require 'config/connect.php';
+require_once 'config/Database.php';
 
-$query = 'select * from nilai';
+$db = new Database();
 
-$datas = $connect->query($query) or die($connect);
+$query = 'select * from nilai_siswa';
 
-if (mysqli_num_rows($datas) > 0) {
-    $rows = [];
+$datas = $db->getConnection()->query($query) or die($connect);
+
+$rows = [];
+if ($datas->num_rows > 0) {
     while ($row = $datas->fetch_assoc()) {
         $rows[] = $row;
     }
-
-    // $rows = $datas->fetch_assoc();
-    // var_dump($rows);
 }
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']);
+} else {
+    $error = null;
+}
+
+// if (mysqli_num_rows($datas) > 0) {
+//     $rows = [];
+//     while ($row = $datas->fetch_assoc()) {
+//         $rows[] = $row;
+//     }
+
+//     // $rows = $datas->fetch_assoc();
+//     // var_dump($rows);
+// }
 
 ?>
 
@@ -24,15 +41,36 @@ if (mysqli_num_rows($datas) > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <link href="dist/output.css" rel="stylesheet">
     <title>Data Nilai</title>
 </head>
 
 <body>
 
-    <?php include 'component/nav.php' ?>
+    <!-- <?php include 'component/nav.php' ?> -->
 
-    <div class="bg-white px-6 py-24 sm:py-32 lg:px-8">
+    <div class="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+        <div class="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]" aria-hidden="true">
+            <div class="relative left-1/2 -z-10 aspect-[1155/678] w-[340.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#00CC99] to-[#6600FF] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem]" style="clip-path: polygon(76% 16%, 47% 9%, 38% 28%, 0% 0%, 0% 25%, 11% 50%, 5% 100%, 25% 90%, 43% 79%, 42% 97%, 75% 91%, 69% 73%, 57% 43%, 96% 33%);"></div>
+        </div>
+        <?php if (isset($error)) : ?>
+            <div id="aler" class="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                </svg>
+                <span class="sr-only">Info</span>
+                <div class="ml-3 text-sm font-medium">
+                    <?= $error; ?>
+                </div>
+                <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700" data-dismiss-target="#aler" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>
+        <?php endif; ?>
         <div class="relative overflow-x-auto shadow-lg sm:rounded-lg max-w-7xl mx-auto">
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <caption class="p-5 text-2xl relative font-semibold isolate text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
@@ -80,9 +118,9 @@ if (mysqli_num_rows($datas) > 0) {
                         <th scope="col" class="px-6 py-3">
                             Grade
                         </th>
-                        <!-- <th scope="col" class="px-6 py-3">
-                            <span class="sr-only">Edit</span>
-                        </th> -->
+                        <th scope="col" class="px-6 py-3">
+                            <span class="">Action</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,35 +135,35 @@ if (mysqli_num_rows($datas) > 0) {
                             </td>
                             </th>
                             <td class="px-6 py-4">
-                                <a href="views/detail.php?siswa=<?= $data['id']; ?>" class="underline-none text-blue-600 hover:underline"><?= $data['nama']; ?></a>
+                                <?= $data['nama']; ?>
                             </td>
                             <td class="px-6 py-4">
                                 <?= $data['kelas']; ?>
                             </td>
                             <td class="px-6 py-4">
-                                <?= $data['nilaiKehadiran']; ?>
+                                <?= $data['nilai_kehadiran']; ?>
                             </td>
                             <td class="px-6 py-4">
-                                <?= $data['nilaiTugas']; ?>
+                                <?= $data['nilai_tugas']; ?>
                             </td>
                             <td class="px-6 py-4">
-                                <?= $data['nilaiFormatif']; ?>
+                                <?= $data['nilai_formatif']; ?>
                             </td>
                             <td class="px-6 py-4">
-                                <?= $data['nilaiUTS']; ?>
+                                <?= $data['nilai_uts']; ?>
                             </td>
                             <td class="px-6 py-4">
-                                <?= $data['nilaiUAS']; ?>
+                                <?= $data['nilai_uas']; ?>
                             </td>
                             <td class="px-6 py-4">
-                                <?= $data['nilaiAkhir']; ?>
+                                <?= $data['nilai_akhir']; ?>
                             </td>
                             <td class="px-6 py-4">
-                                <?= $data['grade']; ?>
+                                <?= $data['result']; ?>
                             </td>
-                            <!-- <td class="px-6 py-4 text-right">
-                            <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                        </td> -->
+                            <td class="px-6 py-4 text-right">
+                                <a href="views/detail.php?siswa=<?= $data['id']; ?>" class="underline-none text-blue-600 hover:underline">Detail</a>
+                            </td>
                         </tr>
                         <?php $i++ ?>
                     <?php endforeach ?>
@@ -133,6 +171,8 @@ if (mysqli_num_rows($datas) > 0) {
             </table>
         </div>
     </div>
+
+    <script src="dist/flowbite.min.js"></script>
 </body>
 
 </html>
