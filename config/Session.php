@@ -2,9 +2,9 @@
 
 class Session
 {
-  public static function validateSession()
+  public static function validate()
   {
-    if (!isset($_SESSION['nis']) || !isset($_SESSION['nama']) || !isset($_SESSION['kelas'])) {
+    if (!isset($_SESSION['nis']) || !isset($_SESSION['nama']) || !isset($_SESSION['kelas']) || !$_SESSION['auth']) {
       throw new Exception("Maaf, Data tidak lengkap");
     }
 
@@ -14,7 +14,7 @@ class Session
     return compact('nis', 'nama', 'kelas');
   }
 
-  public static function handleErrorAndRedirect($errorMessage, $redirectUrl)
+  public static function redirect($errorMessage, $redirectUrl)
   {
     $_SESSION['error'] = $errorMessage;
     header("Location: $redirectUrl");
@@ -22,9 +22,10 @@ class Session
   }
 }
 
+//coba
 try {
-  Session::validateSession();
+  Session::validate();
 } catch (\Throwable $e) {
   $error = $e->getMessage();
-  Session::handleErrorAndRedirect($error, '../');
+  Session::redirect($error, '../');
 }

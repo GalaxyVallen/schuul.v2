@@ -1,0 +1,16 @@
+# Prevent directory listing
+Options -Indexes
+
+# Redirect all requests to index.php
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ /public/$1 [L,QSA]
+
+# Deny access to specific files and directories
+<FilesMatch "^(node_modules|composer\.json|package\.json)">
+    Deny from all
+</FilesMatch>
+
+#stackoverflow
+ErrorDocument 403 /public/http/403.php
+ErrorDocument 404 /public/http/404.php

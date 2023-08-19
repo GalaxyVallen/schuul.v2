@@ -1,10 +1,18 @@
 <?php
+ini_set('session.cache_limiter', 'public');
+session_cache_limiter(false);
+
 session_start();
 
-require_once '../config/Session.php';
-$newSession  = Session::validateSession();
+use Carbon\Carbon;
 
-// Mengakses data dari array yang dihasilkan oleh metode validatenewSession ()
+require_once '../../config/Session.php';
+require_once '../../config/Database.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+Carbon::setLocale('id_ID');
+
+$newSession  = Session::validate();
 $nis = $newSession['nis'];
 $nama = $newSession['nama'];
 $kelas = $newSession['kelas'];
@@ -22,64 +30,70 @@ $kelas = $newSession['kelas'];
 //     header('Location: ../');
 //     exit();
 // }   
+try {
+    $resHadir = ($_SESSION['data'][0] / 14) * 5;
+    $resTugas = $_SESSION['data'][1] * 0.1;
+    $resFormatif = $_SESSION['data'][2] * 0.15;
+    $resUts = $_SESSION['data'][3] * 0.3;
+    $resUas = $_SESSION['data'][4] * 0.4;
+    $tanggal = Carbon::now()->format('Y-m-d H:i:s');
 
-$resHadir = ($_POST['hadir'] / 14) * 5;
-$resTugas = $_POST['tugas'] * 0.1;
-$resFormatif = $_POST['formatif'] * .15;
-$resUts = $_POST['uts'] * .3;
-$resUas = $_POST['uas'] * .4;
+    $nilaiAkhir = number_format($resHadir + $resTugas + $resFormatif + $resUts + $resUas, 2);
 
-$nilaiAkhir = number_format($resHadir + $resTugas + $resFormatif = $resUts + $resUas, 2);
+    if ($nilaiAkhir >= 90) {
+        $result = 'A';
+    } else if ($nilaiAkhir >= 82) {
+        $result = 'B';
+    } else if ($nilaiAkhir >= 79) {
+        $result = 'C';
+    } else if ($nilaiAkhir >= 50) {
+        $result = 'D';
+    } else {
+        $result = 'F';
+    };
 
-if ($nilaiAkhir >= 90) {
-    $result = 'A';
-} else if ($nilaiAkhir >= 82) {
-    $result = 'B';
-} else if ($nilaiAkhir >= 79) {
-    $result = 'C';
-} else if ($nilaiAkhir >= 50) {
-    $result = 'D';
-} else {
-    $result = 'F';
-};
+    $db = new Database();
 
-require_once '../config/Database.php';
+    $query = "INSERT 
+                INTO nilai_siswa
+                (nis, nama, kelas, nilai_kehadiran, nilai_tugas, nilai_formatif, nilai_uts, nilai_uas, result, nilai_akhir, tgl_nilai)
+                VALUES 
+                ('$nis', '$nama', '$kelas', '$resHadir', '$resTugas', '$resFormatif', '$resUts', '$resUas', '$result', '$nilaiAkhir','$tanggal')";
 
-$db = new Database();
-$connect = $db->getConnection();
+    $datas = mysqli_query($db->getConnection(), $query);
 
-$query = "INSERT INTO nilai_siswa
-        (nis, nama, kelas, nilai_kehadiran, nilai_tugas, nilai_formatif, nilai_uts, nilai_uas, result, nilai_akhir)
-        VALUES ('$nis', '$nama', '$kelas', '$resHadir', '$resTugas', '$resFormatif', '$resUts', '$resUas', '$result', '$nilaiAkhir')";
+    if (!$datas) {
+        throw new Exception("Gagal menambahkan data {$nama}");
+    }
 
-$datas = mysqli_query($connect, $query);
+    echo
+    "<script>
+        alert('Data {$nama} berhasil ditambahkan!');
+    </script>";
 
-if ($datas) {
-    echo "
-        <script>
-            alert('Data {$nama} berhasil ditambahkan!');
-        </script>
-    ";
+    unset($_SESSION['auth']);
+    session_unset();
     session_destroy();
-} else {
-    echo "
-        <script>
-            alert('Data {$nama} gagal ditambahkan!');
-        </script>
-    ";
+
+    $db->closeConnection();
+} catch (\Throwable $e) {
+    echo
+    "<script>
+        alert('Terjadi kesalahan: " . addslashes($e->getMessage()) . "');
+    </script>";
 }
 
-$db->closeConnection();
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="../dist/output.css" rel="stylesheet">
-    <title>Nilai
-        <?= $nama ?>
+    <link href="../css/main.css" rel="stylesheet">
+    <title>Siswa <?= $nama ?>
     </title>
 </head>
 
@@ -90,10 +104,10 @@ $db->closeConnection();
             </div>
         </div>
         <div class="mx-auto max-w-2xl text-center">
-            <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Nilai
-                <?= $nama ?: 'Asuka' ?>
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Overview
+                <?= $nama ?: 'Guest' ?>
             </h2>
-            <p class="mt-2 text-lg leading-8 text-gray-600">Back <a href="../">home</a>
+            <p class="mt-2 text-lg leading-8 text-gray-600">Back <a href="../" class="underline-none text-slate-800 hover:underline">home</a>
             </p>
         </div>
         <div class="mx-auto mt-16 max-w-xl sm:mt-20">

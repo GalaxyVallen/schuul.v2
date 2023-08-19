@@ -17,7 +17,9 @@ $kelas = $_POST['kelas'];
 
 <body class="antialiased">
 
-    <div class="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+    <?= $_SERVER['DOCUMENT_ROOT']; ?>
+
+    <!-- <div class="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
         <div class="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]" aria-hidden="true">
             <div class="relative left-1/2 -z-10 aspect-[1155/678] w-[340.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#00CC99] to-[#6600FF] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem]" style="clip-path: polygon(76% 16%, 47% 9%, 38% 28%, 0% 0%, 0% 25%, 11% 50%, 5% 100%, 25% 90%, 43% 79%, 42% 97%, 75% 91%, 69% 73%, 57% 43%, 96% 33%);"></div>
         </div>
@@ -79,7 +81,7 @@ $kelas = $_POST['kelas'];
                 <input type="hidden" name="kelas" value="<?= $kelas ?>">
             </div>
         </form>
-    </div>
+    </div> -->
 
 </body>
 
