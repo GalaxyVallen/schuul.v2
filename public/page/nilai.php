@@ -1,31 +1,35 @@
 <?php
 session_start();
 
-require_once '../../config/Session.php';
+use ev\Models\Session;
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 $newSession = Session::validate();
+//jika ada ns nama
 
 $nis = $newSession['nis'];
 $nama = $newSession['nama'];
 $kelas = $newSession['kelas'];
 
 if (isset($_POST['go'])) {
-    $hadir = $_POST['hadir'];
-    $tugas = $_POST['tugas'];
-    $formatif = $_POST['formatif'];
-    $as = $_POST['uas'];
-    $us = $_POST['uts'];
+    $hadir = htmlspecialchars($_POST['hadir']);
+    $tugas = htmlspecialchars($_POST['tugas']);
+    $formatif = htmlspecialchars($_POST['formatif']);
+    $as = htmlspecialchars($_POST['uas']);
+    $us = htmlspecialchars($_POST['uts']);
 
     try {
         if (empty(trim($hadir)) || empty(trim($tugas)) || empty(trim($formatif)) || empty(trim($as)) || empty(trim($us))) {
-            throw new Exception('Isi semua field!');
+            throw new InvalidArgumentException('Isi semua field!');
         }
 
         if ($tugas > 100 || $formatif > 100 || $as > 100 || $us > 100) {
-            throw new Exception('Nilai tidak boleh lebih dari 100');
+            throw new InvalidArgumentException('Nilai tidak boleh lebih dari 100');
         }
 
         if (!is_numeric($hadir) || !is_numeric($tugas) || !is_numeric($formatif) || !is_numeric($as) | !is_numeric($us)) {
-            throw new Exception('Semua nilai harus berupa angka');
+            throw new InvalidArgumentException('Semua nilai harus berupa angka');
         }
 
         if (empty($errors)) {
@@ -33,13 +37,12 @@ if (isset($_POST['go'])) {
             $_SESSION['nama'] = $nama;
             $_SESSION['nis'] = $nis;
             $_SESSION['kelas'] = $kelas;
-            $_SESSION['auth'] = true;
             $_SESSION['data'] = $data;
 
             header('Location: result.php');
             exit;
         }
-        throw new Exception("Error while processing ur req");
+        throw new InvalidArgumentException("Error while processing ur req");
 
         $_SESSION['auth'] = true;
 

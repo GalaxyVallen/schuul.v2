@@ -1,20 +1,48 @@
 <?php
 session_start();
 
-require_once '../config/Database.php';
-require_once '../config/Function.php';
+use ev\Models\Database;
+use ev\Models\Functions;
 
-$db = new Database();
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$query = 'select * from nilai_siswa';
+try {
+    if (!isset($_SESSION['auth'])) {
+        throw new InvalidArgumentException("Anda belum login. Harap masuk terlebih dahulu.");
+    }
 
-$datas = $db->getConnection()->query($query) or die($connect);
+    $db = new Database();
 
-// if (mysqli_num_rows($datas) > 0) {
+    $query = 'select * from nilai_siswa';
+    $conn = $db->getConnection();
+
+    $datas = $conn->query($query);
+
+    if ($datas === false) {
+        $error = "Terjadi kesalahan saat menjalankan query: " . $connection->errno . " - " . $connection->error;
+    } else {
+        // Processing of fetched data
+    }
+
+    if (isset($_SESSION['error'])) {
+        $error = $_SESSION['error'];
+        unset($_SESSION['error']);
+    } else {
+        $error = null;
+    }
+} catch (Exception $e) {
+    $error = $e->getMessage();
+    $_SESSION['guest'] = $error;
+    header('Location: auth/login.php');
+    exit;
+}
+
+
+
+/// if (mysqli_num_rows($datas) > 0) {
 //     // while ($row = $datas->fetch_assoc()) {
 //     //     $rows[] = $row;
-//     // }
-
+//     // 
 //     // while ($row = $datas->fetch_object()) {
 //     //     $rows[] = $row;
 //     //     // var_dump($row);
@@ -23,17 +51,9 @@ $datas = $db->getConnection()->query($query) or die($connect);
 //     // die;
 // }
 
-// if (isset($_SESSION['auth'])) {
+/// if (isset($_SESSION['auth'])) {
 //     unset($_SESSION['auth']);
 // }
-
-if (isset($_SESSION['error'])) {
-    $error = $_SESSION['error'];
-    unset($_SESSION['error']);
-} else {
-    $error = null;
-}
-
 // if (mysqli_num_rows($datas) > 0) {
 //     $rows = [];
 //     while ($row = $datas->fetch_assoc()) {
@@ -52,7 +72,6 @@ if (isset($_SESSION['error'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <link href="css/main.css" rel="stylesheet">
     <title>Data Nilai</title>
 </head>
@@ -83,6 +102,8 @@ if (isset($_SESSION['error'])) {
             </div>
         <?php endif; ?>
         <div class="relative overflow-x-auto shadow-lg sm:rounded-lg max-w-7xl mx-auto">
+            <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Welcome <?= $_SESSION['username'] ?? 'rei'; ?></h1>
+            <!-- <p class="mb-6 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Here at Flowbite we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.</p> -->
             <table class="w-full table-auto text-sm text-left">
                 <caption class="p-5 text-2xl font-display relative font-semibold isolate text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                     Semua siswa yg terdaftar
@@ -94,6 +115,9 @@ if (isset($_SESSION['error'])) {
                     <div class="bg-gradient-to-br from-sky-50 to-transparent dark:from-blue-900 w-full h-full absolute top-0 left-0 -z-10"></div>
                     <a href="page/add.php" class="text-gray-100 inline-block mt-3 bg-blue-600 hover:bg-primary-800 focus:ring-4 hover:bg-blue-700 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
                         Tambah siswa
+                    </a>
+                    <a href="logout.php" onclick="return confirm('Want to logout <?= $_SESSION['username']; ?> ?')" class="text-gray-100 inline-block mt-3 bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                        Log out
                     </a>
                 </caption>
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

@@ -1,5 +1,11 @@
 {
   "require": {
     "nesbot/carbon": "^2.69"
-  }
+  },
+  "autoload": {
+    "psr-4": {
+      "ev\\": "App/"
+    }
+  },
+  "_comment": "namespace nya ev dan apapaun folder yg ada didalam app/ itu merupakan class App/Models/<class>"
 }

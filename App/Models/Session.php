@@ -1,11 +1,15 @@
 <?php
 
+namespace ev\Models;
+
+use InvalidArgumentException;
+
 class Session
 {
   public static function validate()
   {
     if (!isset($_SESSION['nis']) || !isset($_SESSION['nama']) || !isset($_SESSION['kelas']) || !$_SESSION['auth']) {
-      throw new Exception("Maaf, Data tidak lengkap");
+      throw new InvalidArgumentException("Maaf, Data tidak lengkap");
     }
 
     $nis = $_SESSION['nis'];
@@ -14,10 +18,10 @@ class Session
     return compact('nis', 'nama', 'kelas');
   }
 
-  public static function redirect($errorMessage, $redirectUrl)
+  public static function redirect(string $errMsg, string $redirect)
   {
-    $_SESSION['error'] = $errorMessage;
-    header("Location: $redirectUrl");
+    $_SESSION['error'] = $errMsg;
+    header("Location: $redirect");
     exit();
   }
 }
