@@ -134,6 +134,7 @@ if (isset($_POST['go'])) {
       </div>
     </div>
   </div>
+  
   <script src="../dist/flowbite.min.js"></script>
 </body>
 
