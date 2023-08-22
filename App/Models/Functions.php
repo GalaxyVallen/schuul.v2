@@ -1,4 +1,5 @@
 <?php
+namespace ev\Models;
 
 class Functions
 {
@@ -6,7 +7,7 @@ class Functions
   {
     if ($data >= 90) {
       return 'text-green-600';
-    } else if ($data >= 82) {
+    } elseif ($data >= 82) {
       return 'text-yellow-500';
     } else {
       return 'text-red-600';

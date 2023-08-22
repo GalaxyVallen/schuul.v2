@@ -5,9 +5,9 @@ session_cache_limiter(false);
 session_start();
 
 use Carbon\Carbon;
+use ev\Models\Session;
+use ev\Models\Database;
 
-require_once '../../config/Session.php';
-require_once '../../config/Database.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 Carbon::setLocale('id_ID');
@@ -16,7 +16,8 @@ $newSession  = Session::validate();
 $nis = $newSession['nis'];
 $nama = $newSession['nama'];
 $kelas = $newSession['kelas'];
-// try {
+
+/// try {
 //     if (!isset($_SESSION['nis']) && !isset($_SESSION['nama']) && !isset($_SESSION['kelas'])) {
 //         throw new Exception("Maaf, Data tidak lengkap");
 //     }
@@ -30,6 +31,7 @@ $kelas = $newSession['kelas'];
 //     header('Location: ../');
 //     exit();
 // }   
+
 try {
     $resHadir = ($_SESSION['data'][0] / 14) * 5;
     $resTugas = $_SESSION['data'][1] * 0.1;
@@ -40,17 +42,22 @@ try {
 
     $nilaiAkhir = number_format($resHadir + $resTugas + $resFormatif + $resUts + $resUas, 2);
 
-    if ($nilaiAkhir >= 90) {
-        $result = 'A';
-    } else if ($nilaiAkhir >= 82) {
-        $result = 'B';
-    } else if ($nilaiAkhir >= 79) {
-        $result = 'C';
-    } else if ($nilaiAkhir >= 50) {
-        $result = 'D';
-    } else {
-        $result = 'F';
-    };
+    $max = [
+        90 => 'A',
+        82 => 'B',
+        79 => 'C',
+        50 => 'D',
+    ];
+
+    $result = 'F';
+
+    foreach ($max as $nilai => $grade) {
+        if ($nilaiAkhir >= $nilai) {
+            $result = $grade;
+            break; //
+        }
+    }
+
 
     $db = new Database();
 
@@ -63,7 +70,7 @@ try {
     $datas = mysqli_query($db->getConnection(), $query);
 
     if (!$datas) {
-        throw new Exception("Gagal menambahkan data {$nama}");
+        throw new InvalidArgumentException("Gagal menambahkan data {$nama}");
     }
 
     echo
@@ -71,9 +78,9 @@ try {
         alert('Data {$nama} berhasil ditambahkan!');
     </script>";
 
-    unset($_SESSION['auth']);
-    session_unset();
-    session_destroy();
+    unset($_SESSION['nis']);
+    unset($_SESSION['nama']);
+    unset($_SESSION['kelas']);
 
     $db->closeConnection();
 } catch (\Throwable $e) {
@@ -81,6 +88,8 @@ try {
     "<script>
         alert('Terjadi kesalahan: " . addslashes($e->getMessage()) . "');
     </script>";
+    header('Location: /');
+    exit;
 }
 
 ?>
@@ -97,7 +106,7 @@ try {
     </title>
 </head>
 
-<body>
+<body class="antialiased">
     <div class="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
         <div class="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]" aria-hidden="true">
             <div class="relative left-1/2 -z-10 aspect-[1155/678] w-[340.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#00CC99] to-[#6600FF] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem]" style="clip-path: polygon(76% 16%, 47% 9%, 38% 28%, 0% 0%, 0% 25%, 11% 50%, 5% 100%, 25% 90%, 43% 79%, 42% 97%, 75% 91%, 69% 73%, 57% 43%, 96% 33%);">

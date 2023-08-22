@@ -1,8 +1,9 @@
 <?php
 session_start();
 
-require_once '../../config/Database.php';
-require_once '../../config/Function.php';
+use ev\Models\Database;
+use ev\Models\Functions;
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Carbon\Carbon;
@@ -19,11 +20,11 @@ try {
     $result = $db->getConnection()->query($query);
 
     if (!$result) {
-        throw new Exception("Query error: " . $db->getConnection()->error);
+        throw new InvalidArgumentException("Query error: " . $db->getConnection()->error);
     }
 
     if (mysqli_num_rows($result) == 0) {
-        throw new Exception("No data found for id " . $_GET['siswa']);
+        throw new InvalidArgumentException("No data found for id " . $_GET['siswa']);
     }
 
     $data = $result->fetch_object();
@@ -32,7 +33,7 @@ try {
 } catch (\Throwable $e) {
     $error = $e->getMessage();
     $_SESSION['error'] = $error;
-    header('Location: ../index.php');
+    header('Location: ../');
     exit();
 }
 

@@ -4,8 +4,8 @@ session_cache_limiter(false);
 
 session_start();
 
-if (isset($_SESSION['auth'])) {
-    header('Location: nilai.php');
+if (!isset($_SESSION['auth'])) {
+    header('Location: ../auth/login.php');
     exit;
 }
 
@@ -16,31 +16,27 @@ if (isset($_POST['go'])) {
 
     try {
         if (empty(trim($nama)) || empty(trim($nis)) || $kelas === 'x') {
-            throw new Exception('Isi semua field!');
+            throw new InvalidArgumentException('Isi semua field!');
         }
 
         if (!preg_match('/^[0-9]+$/', $nis)) {
-            throw new Exception('NIS harus berupa nomor!');
+            throw new InvalidArgumentException('NIS harus berupa nomor!');
         }
 
         if (strlen($nis) !== 10) {
-            throw new Exception('Panjang NIS harus tepat 10 karakter!');
+            throw new InvalidArgumentException('Panjang NIS harus tepat 10 karakter!');
         }
 
         if (empty($errors)) {
-            // var_dump($kelas);
-            // die;
-
             $_SESSION['nama'] = $nama;
             $_SESSION['nis'] = $nis;
             $_SESSION['kelas'] = $kelas;
-            $_SESSION['auth'] = true;
 
             header('Location: nilai.php');
             exit;
         }
 
-        throw new Exception("Error while processing ur req");
+        throw new InvalidArgumentException("Error while processing ur req");
     } catch (\Throwable $e) {
         $errors = $e->getMessage();
     }
@@ -54,10 +50,7 @@ if (isset($_POST['go'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <link href="../css/main.css" rel="stylesheet">
-    <!-- <link rel="stylesheet" href="css/bootstrap.min.css">
-    <script src="js/bootstrap.min.js"></script> -->
     <title>Data siswa</title>
 </head>
 <!-- //masukin data siswa -->
@@ -75,7 +68,7 @@ if (isset($_POST['go'])) {
 
         <form action="" method="post" class="mx-auto mt-16 max-w-xl sm:mt-20">
             <?php if (!empty($errors)) : ?>
-                <div id="aler" class="shadow-lg hover:shadow-xl duration-100 sm:max-w-7xl mx-auto flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <div id="aler" class="shadow-lg hover:shadow-xl duration-100 sm:max-w-7xl mx-auto flex items-center p-4 mb-6 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
                     <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                     </svg>
@@ -93,10 +86,10 @@ if (isset($_POST['go'])) {
             <?php endif; ?>
             <div class="grid grid-cols-1 gap-x-8 gap-y-6">
                 <div>
-                    <div class="relative z-0 w-full mb-6 group">
-                        <input type="number" name="nis" onkeyup="updateFraction();" value="<?php if (!empty($_POST['nis'])) : ?><?= $_POST['nis']; ?><?php endif; ?>" id="floating_Nis" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-                        <label for="floating_Nis" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 invalid:text-red-500 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nis siswa</label>
-                        <small class="text-gray-700 ml-2" id="fractionText"></small>
+                    <div class="relative z-0 w-full mb-5 group">
+                        <input type="number" name="nis" onkeyup="updateFraction();" value="<?php if (!empty($_POST['nis'])) echo $_POST['nis'] ?>" id="floating_Nis" class="block py-2.5 px-0 w-full border-gray-300 text-sm text-gray-900 bg-transparent border-0 border-b-2  appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
+                        <label for="floating_Nis" class="peer-focus:font-medium absolute text-sm duration-300 <?= (!empty($errors)) ? 'text-red-500' : 'text-gray-500 dark:text-gray-400 peer-focus:text-blue-600 peer-focus:dark:text-blue-500' ?> transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nis siswa</label>
+                        <small class="text-gray-600 ml-2" id="fractionText"></small>
                     </div>
                 </div>
                 <div>
@@ -134,8 +127,6 @@ if (isset($_POST['go'])) {
 
     <script src="../dist/flowbite.min.js"></script>
     <script>
-        let timeoutId;
-
         function updateFraction() {
             const inputValue = document.getElementById('floating_Nis').value;
             const fractionText = document.getElementById('fractionText');
